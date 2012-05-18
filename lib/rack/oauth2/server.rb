@@ -236,6 +236,7 @@ module Rack
           # 5.1.3.  Form-Encoded Body Parameter
           token   = request.GET["oauth_token"] || request.POST["oauth_token"]
           token ||= request.GET['access_token'] || request.POST['access_token']
+          token ||= request.GET['bearer_token'] || request.POST['bearer_token']
         end
 
         if token
