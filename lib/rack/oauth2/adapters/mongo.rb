@@ -48,10 +48,3 @@ module Rack
     end
   end
 end
-
-
-require "rack/oauth2/adapters/mongo/client"
-require "rack/oauth2/adapters/mongo/auth_request"
-require "rack/oauth2/adapters/mongo/access_grant"
-require "rack/oauth2/adapters/mongo/access_token"
-require "rack/oauth2/adapters/mongo/issuer"
