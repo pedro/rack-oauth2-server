@@ -115,7 +115,7 @@ class Test::Unit::TestCase
   def teardown
     Server::Client.collection.drop
     Server::AuthRequest.collection.drop
-    Server::AccessGrant.collection.drop
+    Server::AccessGrant.delete_all
     Server::AccessToken.collection.drop
     Server::Issuer.collection.drop
   end

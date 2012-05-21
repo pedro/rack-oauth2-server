@@ -2,7 +2,7 @@ module Rack
   module OAuth2
     class Server
 
-      class Client
+      class Client < BaseModel
 
         class << self
           # Authenticate a client request. This method takes three arguments,
@@ -104,7 +104,7 @@ module Rack
           self.revoked = Time.now.to_i
           Client.collection.update({ :_id=>id }, { :$set=>{ :revoked=>revoked } })
           AuthRequest.collection.update({ :client_id=>id }, { :$set=>{ :revoked=>revoked } })
-          AccessGrant.collection.update({ :client_id=>id }, { :$set=>{ :revoked=>revoked } })
+          AccessGrant.update({ :client_id=>id }, { :$set=>{ :revoked=>revoked } })
           AccessToken.collection.update({ :client_id=>id }, { :$set=>{ :revoked=>revoked } })
         end
 

@@ -6,7 +6,7 @@ module Rack
       #
       # An access token is a unique code, associated with a client, an identity
       # and scope. It may be revoked, or expire after a certain period.
-      class AccessToken
+      class AccessToken < BaseModel
         class << self
 
           # Find AccessToken from token. Does not return revoked tokens.

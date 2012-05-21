@@ -5,7 +5,7 @@ module Rack
       # Authorization request. Represents request on behalf of client to access
       # particular scope. Use this to keep state from incoming authorization
       # request to grant/deny redirect.
-      class AuthRequest
+      class AuthRequest < BaseModel
         class << self
           # Find AuthRequest from identifier.
           def find(request_id)

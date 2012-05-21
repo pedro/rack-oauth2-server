@@ -4,11 +4,11 @@ module Rack
 
       # The access grant is a nonce, new grant created each time we need it and
       # good for redeeming one access token.
-      class AccessGrant
+      class AccessGrant < BaseModel
         class << self
           # Find AccessGrant from authentication code.
           def from_code(code)
-            Server.new_instance self, collection.find_one({ :_id=>code, :revoked=>nil })
+            Server.new_instance self, first({ :_id=>code, :revoked=>nil })
           end
 
           # Create a new access grant.
@@ -20,13 +20,12 @@ module Rack
                        :client_id=>client.id, :redirect_uri=>client.redirect_uri || redirect_uri,
                        :created_at=>Time.now.to_i, :expires_at=>expires_at, :granted_at=>nil,
                        :access_token=>nil, :revoked=>nil }
-            collection.insert fields
+            insert fields
             Server.new_instance self, fields
           end
 
-          def collection
-            prefix = Server.options[:collection_prefix]
-            Server.database["#{prefix}.access_grants"]
+          def collection_name
+            "access_grants"
           end
         end
 
@@ -64,20 +63,20 @@ module Rack
           access_token = AccessToken.get_token_for(identity, client, scope, expires_in)
           self.access_token = access_token.token
           self.granted_at = Time.now.to_i
-          self.class.collection.update({ :_id=>code, :access_token=>nil, :revoked=>nil }, { :$set=>{ :granted_at=>granted_at, :access_token=>access_token.token } }, :safe=>true)
-          reload = self.class.collection.find_one({ :_id=>code, :revoked=>nil }, { :fields=>%w{access_token} })
+          self.class.update({ :_id=>code, :access_token=>nil, :revoked=>nil }, { :$set=>{ :granted_at=>granted_at, :access_token=>access_token.token }})
+          reload = self.class.first({ :_id=>code, :revoked=>nil })
           raise InvalidGrantError unless reload && reload["access_token"] == access_token.token
           return access_token
         end
 
         def revoke!
           self.revoked = Time.now.to_i
-          self.class.collection.update({ :_id=>code, :revoked=>nil }, { :$set=>{ :revoked=>revoked } })
+          self.class.update({ :_id=>code, :revoked=>nil }, { :$set=>{ :revoked=>revoked } })
         end
 
         Server.create_indexes do
           # Used to revoke all pending access grants when revoking client.
-          collection.create_index [[:client_id, Mongo::ASCENDING]]
+          # collection.create_index [[:client_id, Mongo::ASCENDING]]
         end
       end
 
